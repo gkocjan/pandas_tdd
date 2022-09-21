@@ -1,4 +1,7 @@
 {
+    "editor.formatOnSave": true,
+    "python.formatting.provider": "black",
+    "python.analysis.typeCheckingMode": "basic",
     "python.testing.pytestArgs": [
         "tests"
     ],
