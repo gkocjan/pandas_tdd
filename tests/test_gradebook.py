@@ -22,7 +22,7 @@ def test_results_are_grouped_by_student_group_for_students_in_one_group():
             "ID": 1,
             "Name": "Doe, John",
             "NetID": "JXD12345",
-            "Email Adress": "JOHN.DOE@EXAMPLE.EDU",
+            "Email Address": "JOHN.DOE@EXAMPLE.EDU",
             "Group": 1,
         }
     ]
@@ -39,14 +39,14 @@ def test_results_are_grouped_by_student_group_for_students_in_multiple_groups():
             "ID": 1,
             "Name": "Doe, John",
             "NetID": "JXD12345",
-            "Email Adress": "JOHN.DOE@EXAMPLE.EDU",
+            "Email Address": "JOHN.DOE@EXAMPLE.EDU",
             "Group": 1,
         },
         {
             "ID": 2,
             "Name": "Doe, Second",
             "NetID": "SXD54321",
-            "Email Adress": "SECOND.DOE@EXAMPLE.EDU",
+            "Email Address": "SECOND.DOE@EXAMPLE.EDU",
             "Group": 2,
         },
     ]
@@ -63,14 +63,14 @@ def test_results_group_contains_students_net_id_lowercase():
             "ID": 1,
             "Name": "Doe, John",
             "NetID": "JXD12345",
-            "Email Adress": "JOHN.DOE@EXAMPLE.EDU",
+            "Email Address": "JOHN.DOE@EXAMPLE.EDU",
             "Group": 1,
         },
         {
             "ID": 2,
             "Name": "Doe, Second",
             "NetID": "SXD54321",
-            "Email Adress": "SECOND.DOE@EXAMPLE.EDU",
+            "Email Address": "SECOND.DOE@EXAMPLE.EDU",
             "Group": 1,
         },
     ]
