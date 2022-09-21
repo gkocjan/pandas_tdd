@@ -8,6 +8,8 @@ def _create_group(raw_students_group: pd.DataFrame) -> pd.DataFrame:
     return result.assign(
         net_id=raw_students_group["NetID"].str.lower(),
         email_address=raw_students_group["Email Address"].str.lower(),
+        first_name=raw_students_group["Name"].str.split(", ", expand=True)[1],
+        last_name=raw_students_group["Name"].str.split(", ", expand=True)[0],
     )
 
 
@@ -96,4 +98,26 @@ def test_results_group_contains_students_email_adress_lowercase(
     assert result[1]["email_address"].to_list() == [
         "john.doe@example.edu",
         "second.doe@example.edu",
+    ]
+
+
+def test_results_group_contains_students_first_name(
+    two_students_in_the_same_group,
+):
+    result = generate_grade_book(students_df=two_students_in_the_same_group)
+
+    assert result[1]["first_name"].to_list() == [
+        "John",
+        "Second",
+    ]
+
+
+def test_results_group_contains_students_last_name(
+    two_students_in_the_same_group,
+):
+    result = generate_grade_book(students_df=two_students_in_the_same_group)
+
+    assert result[1]["last_name"].to_list() == [
+        "Doe",
+        "Doe",
     ]
