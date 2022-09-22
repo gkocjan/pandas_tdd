@@ -36,15 +36,7 @@ class Gradebook:
     def generate(self) -> dict[int, pd.DataFrame]:
         students_with_scores = self._students_df
 
-        result = pd.DataFrame(index=students_with_scores.index)
-        result = result.assign(
-            net_id=students_with_scores.index,
-            group=students_with_scores["Group"],
-            email_address=students_with_scores["Email Address"],
-        )
-        result[["last_name", "first_name"]] = students_with_scores["Name"].str.split(
-            ", ", expand=True
-        )
+        result = self._base_student_information()
 
         homework_scores = students_with_scores.filter(
             regex=r"^homework_\d\d?$",
@@ -127,6 +119,18 @@ class Gradebook:
                 columns=["First Name", "Last Name"]
             ).rename(columns={"Grade": quiz_name})
             result = pd.concat([result, quiz_results], axis=1)
+        return result
+
+    def _base_student_information(self) -> pd.DataFrame:
+        result = pd.DataFrame(index=self._students_df.index)
+        result = result.assign(
+            net_id=self._students_df.index,
+            group=self._students_df["Group"],
+            email_address=self._students_df["Email Address"],
+        )
+        result[["last_name", "first_name"]] = self._students_df["Name"].str.split(
+            ", ", expand=True
+        )
         return result
 
     def _sum_of_quiz_max(self) -> int:
