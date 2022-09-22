@@ -122,9 +122,12 @@ def test_results_group_contains_students_net_id_lowercase(
 
 
 def test_results_group_contains_students_email_adress_lowercase(
-    two_students_in_the_same_group,
+    two_students_in_the_same_group_with_homeworks,
 ):
-    result = generate_grade_book(students_df=two_students_in_the_same_group)
+    students_df, homework_exams_df = two_students_in_the_same_group_with_homeworks
+    result = generate_grade_book(
+        students_df=students_df, homework_exams_df=homework_exams_df
+    )
 
     assert result[1]["email_address"].to_list() == [
         "john.doe@example.edu",
@@ -133,9 +136,12 @@ def test_results_group_contains_students_email_adress_lowercase(
 
 
 def test_results_group_contains_students_first_name(
-    two_students_in_the_same_group,
+    two_students_in_the_same_group_with_homeworks,
 ):
-    result = generate_grade_book(students_df=two_students_in_the_same_group)
+    students_df, homework_exams_df = two_students_in_the_same_group_with_homeworks
+    result = generate_grade_book(
+        students_df=students_df, homework_exams_df=homework_exams_df
+    )
 
     assert result[1]["first_name"].to_list() == [
         "John",
@@ -144,9 +150,12 @@ def test_results_group_contains_students_first_name(
 
 
 def test_results_group_contains_students_last_name(
-    two_students_in_the_same_group,
+    two_students_in_the_same_group_with_homeworks,
 ):
-    result = generate_grade_book(students_df=two_students_in_the_same_group)
+    students_df, homework_exams_df = two_students_in_the_same_group_with_homeworks
+    result = generate_grade_book(
+        students_df=students_df, homework_exams_df=homework_exams_df
+    )
 
     assert result[1]["last_name"].to_list() == [
         "Doe",
