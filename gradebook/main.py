@@ -96,7 +96,9 @@ class Gradebook:
         sum_of_quiz_scores = students_with_scores.filter(
             regex=r"^quiz_\d$", axis=1
         ).sum(axis=1)
-        sum_of_quiz_max = sum(self._max_quiz_scores.values())
-        result["quiz_score"] = (sum_of_quiz_scores / sum_of_quiz_max).round(2)
+        result["quiz_score"] = (sum_of_quiz_scores / self._sum_of_quiz_max()).round(2)
 
         return {cast(int, group): table for group, table in result.groupby("group")}
+
+    def _sum_of_quiz_max(self) -> int:
+        return sum(self._max_quiz_scores.values())
