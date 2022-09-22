@@ -197,27 +197,11 @@ def test_results_group_contains_students_last_name(
     ]
 
 
-def test_results_group_contains_students_homework_average_for_single_homework():
-    students = [
-        {
-            "ID": 1,
-            "Name": "Doe, John",
-            "NetID": "JXD12345",
-            "Email Address": "JOHN.DOE@EXAMPLE.EDU",
-            "Group": 1,
-        }
-    ]
-    students_df = pd.DataFrame(data=students).set_index("NetID")
-    homework_exams = [
-        {
-            "First Name": "John",
-            "Last Name": "Doe",
-            "SID": "jxd12345",
-            "homework_1": 25,
-            "homework_1_max_points": 50,
-        }
-    ]
-    homework_exams_df = pd.DataFrame(data=homework_exams).set_index("SID")
+def test_results_group_contains_students_homework_average_for_single_homework(
+    students_factory, homework_exams_factory
+):
+    students_df = students_factory.build_df_batch(size=1)
+    homework_exams_df = homework_exams_factory.build_df_batch(size=1)
 
     result = generate_gradebook(
         students_df=students_df,
