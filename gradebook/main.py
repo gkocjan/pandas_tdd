@@ -49,10 +49,7 @@ class Gradebook:
                 / students_with_scores[f"exam_{exam_numer}_max_points"]
             )
 
-        sum_of_quiz_scores = students_with_scores.filter(
-            regex=r"^quiz_\d$", axis=1
-        ).sum(axis=1)
-        result["quiz_score"] = (sum_of_quiz_scores / self._sum_of_quiz_max()).round(2)
+        result["quiz_score"] = self._quiz_score()
 
         return {cast(int, group): table for group, table in result.groupby("group")}
 
@@ -134,6 +131,12 @@ class Gradebook:
         number_of_homeworks = homework_scores.shape[1]
 
         return sum_of_homework_averages / number_of_homeworks
+
+    def _quiz_score(self) -> pd.Series:
+        sum_of_quiz_scores = self._students_df.filter(regex=r"^quiz_\d$", axis=1).sum(
+            axis=1
+        )
+        return (sum_of_quiz_scores / self._sum_of_quiz_max()).round(2)
 
     def _sum_of_quiz_max(self) -> int:
         return sum(self._max_quiz_scores.values())
