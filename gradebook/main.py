@@ -78,4 +78,4 @@ def generate_gradebook(
     sum_of_quiz_max = sum(max_quiz_scores.values())
     result["quiz_score"] = (sum_of_quiz_scores / sum_of_quiz_max).round(2)
 
-    return {cast(int, group): table for group, table in result.groupby("Group")}
+    return {cast(int, group): table for group, table in result.groupby("group")}
