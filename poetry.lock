@@ -79,6 +79,21 @@ optional = false
 python-versions = ">=3.6"
 
 [[package]]
+name = "factory-boy"
+version = "3.2.1"
+description = "A versatile test fixtures replacement based on thoughtbot's factory_bot for Ruby."
+category = "dev"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+Faker = ">=0.7.0"
+
+[package.extras]
+dev = ["coverage", "django", "flake8", "isort", "pillow", "sqlalchemy", "mongoengine", "wheel (>=0.32.0)", "tox", "zest.releaser"]
+doc = ["sphinx", "sphinx-rtd-theme", "sphinxcontrib-spelling"]
+
+[[package]]
 name = "faker"
 version = "14.2.0"
 description = "Faker is a Python package that generates fake data for you."
@@ -383,7 +398,7 @@ python-versions = ">=3.7"
 [metadata]
 lock-version = "1.1"
 python-versions = "~3.10"
-content-hash = "2f4dbb52e8f7daa4779f3f5248c912b0f5e3dd8739887f04596bca8be8240159"
+content-hash = "9492f67874f5d1a1ba1e11e3b1ec189570d51c10af80be345d72cb968993181d"
 
 [metadata.files]
 attrs = []
@@ -398,6 +413,10 @@ colorama = [
 ]
 contourpy = []
 cycler = []
+factory-boy = [
+    {file = "factory_boy-3.2.1-py2.py3-none-any.whl", hash = "sha256:eb02a7dd1b577ef606b75a253b9818e6f9eaf996d94449c9d5ebb124f90dc795"},
+    {file = "factory_boy-3.2.1.tar.gz", hash = "sha256:a98d277b0c047c75eb6e4ab8508a7f81fb03d2cb21986f627913546ef7a2a55e"},
+]
 faker = []
 fonttools = []
 iniconfig = [

@@ -1,7 +1,77 @@
+import factory
 import pandas as pd
 import pytest
 
 from gradebook.main import generate_gradebook
+
+
+@pytest.fixture
+def students_factory():
+    class StudentsFactory(factory.DictFactory):
+        class Meta:
+            rename = {"Email_Address": "Email Address"}
+
+        ID = factory.Sequence(lambda n: n + 1)
+        Name = factory.Iterator(["Doe, John", "Doe, Second"])
+        NetID = factory.Iterator(["JXD12345", "SXD54321"])
+        Email_Address = factory.LazyAttribute(
+            lambda o: f'{o.Name.split(", ")[1]}.{o.Name.split(", ")[0]}@EXAMPLE.EDU'.upper()
+        )
+        Group = 1
+
+    return StudentsFactory
+
+
+@pytest.fixture
+def homework_exams_factory():
+    class HomeworkExamsFactory(factory.DictFactory):
+        class Meta:
+            rename = {
+                "First_Name": "First Name",
+                "Last_Name": "Last Name",
+            }
+
+        First_Name = factory.Iterator(["John", "Second"])
+        Last_Name = factory.Iterator(["Doe", "Doe"])
+        SID = factory.Iterator(["jxd12345", "sxd54321"])
+        homework_1 = factory.Iterator([25, 40])
+        homework_1_max_points = factory.Iterator([50, 50])
+
+    return HomeworkExamsFactory
+
+
+def test_students_factory(students_factory):
+    assert students_factory.create() == {
+        "ID": 1,
+        "Name": "Doe, John",
+        "NetID": "JXD12345",
+        "Email Address": "JOHN.DOE@EXAMPLE.EDU",
+        "Group": 1,
+    }
+    assert students_factory.create() == {
+        "ID": 2,
+        "Name": "Doe, Second",
+        "NetID": "SXD54321",
+        "Email Address": "SECOND.DOE@EXAMPLE.EDU",
+        "Group": 1,
+    }
+
+
+def test_homework_factory(homework_exams_factory):
+    assert homework_exams_factory.create() == {
+        "First Name": "John",
+        "Last Name": "Doe",
+        "SID": "jxd12345",
+        "homework_1": 25,
+        "homework_1_max_points": 50,
+    }
+    assert homework_exams_factory.create() == {
+        "First Name": "Second",
+        "Last Name": "Doe",
+        "SID": "sxd54321",
+        "homework_1": 40,
+        "homework_1_max_points": 50,
+    }
 
 
 def test_results_are_grouped_by_student_group_for_students_in_one_group():
