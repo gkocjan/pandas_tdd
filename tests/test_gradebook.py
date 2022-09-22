@@ -80,6 +80,21 @@ def multiple_homework_factory(homework_factory) -> type[DataFrameFactory]:
     return MultipleHomeworkFactory
 
 
+@pytest.fixture
+def multiple_homework_exams_factory(
+    multiple_homework_factory,
+) -> type[DataFrameFactory]:
+    class MultipleHomeworkExamsFactory(multiple_homework_factory):
+        exam_1 = factory.Iterator([95, 95])
+        exam_1_max_points = factory.Iterator([100, 100])
+        exam_2 = factory.Iterator([90, 77])
+        exam_2_max_points = factory.Iterator([100, 100])
+        exam_3 = factory.Iterator([73, 79])
+        exam_3_max_points = factory.Iterator([100, 100])
+
+    return MultipleHomeworkExamsFactory
+
+
 def test_students_factory(students_factory):
     assert students_factory.create() == {
         "ID": 1,
@@ -236,3 +251,19 @@ def test_results_group_contains_students_homework_score_for_multiple_homeworks(
     )
 
     assert result[1]["homework_average"].to_list() == [0.4, 0.7]
+
+
+def test_results_group_contains_students_exam_score_for_multiple_homeworks(
+    students_factory, multiple_homework_exams_factory
+):
+    students_df = students_factory.build_df_batch(size=2)
+    homework_exams_df = multiple_homework_exams_factory.build_df_batch(size=2)
+
+    result = generate_gradebook(
+        students_df=students_df,
+        homework_exams_df=homework_exams_df,
+    )
+
+    assert result[1]["exam_1_score"].to_list() == [0.95, 0.95]
+    assert result[1]["exam_2_score"].to_list() == [0.9, 0.77]
+    assert result[1]["exam_3_score"].to_list() == [0.73, 0.79]
