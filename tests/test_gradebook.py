@@ -46,8 +46,8 @@ def students_factory() -> type[DataFrameFactory]:
 
 
 @pytest.fixture
-def homework_exams_factory() -> type[DataFrameFactory]:
-    class HomeworkExamsFactory(DataFrameFactory):
+def homework_factory() -> type[DataFrameFactory]:
+    class HomeworkFactory(DataFrameFactory):
         class Meta:
             rename = {
                 "First_Name": "First Name",
@@ -64,12 +64,12 @@ def homework_exams_factory() -> type[DataFrameFactory]:
         def _converted_rows_to_df(cls, converterd_rows: list[dict]) -> pd.DataFrame:
             return pd.DataFrame(data=converterd_rows).set_index("SID")
 
-    return HomeworkExamsFactory
+    return HomeworkFactory
 
 
 @pytest.fixture
-def multiple_homework_exams_factory(homework_exams_factory) -> type[DataFrameFactory]:
-    class MultipleHomeworkExamsFactory(homework_exams_factory):
+def multiple_homework_factory(homework_factory) -> type[DataFrameFactory]:
+    class MultipleHomeworkFactory(homework_factory):
         homework_2 = factory.Iterator([25, 40])
         homework_2_max_points = factory.Iterator([50, 50])
         homework_3 = factory.Iterator([30, 10])
@@ -77,7 +77,7 @@ def multiple_homework_exams_factory(homework_exams_factory) -> type[DataFrameFac
         homework_4 = factory.Iterator([0, 50])
         homework_4_max_points = factory.Iterator([50, 50])
 
-    return MultipleHomeworkExamsFactory
+    return MultipleHomeworkFactory
 
 
 def test_students_factory(students_factory):
@@ -97,15 +97,15 @@ def test_students_factory(students_factory):
     }
 
 
-def test_homework_factory(homework_exams_factory):
-    assert homework_exams_factory.create() == {
+def test_homework_factory(homework_factory):
+    assert homework_factory.create() == {
         "First Name": "John",
         "Last Name": "Doe",
         "SID": "jxd12345",
         "homework_1": 25,
         "homework_1_max_points": 50,
     }
-    assert homework_exams_factory.create() == {
+    assert homework_factory.create() == {
         "First Name": "Second",
         "Last Name": "Doe",
         "SID": "sxd54321",
@@ -115,10 +115,10 @@ def test_homework_factory(homework_exams_factory):
 
 
 def test_results_are_grouped_by_student_group_for_students_in_one_group(
-    students_factory, homework_exams_factory
+    students_factory, homework_factory
 ):
     students_df = students_factory.build_df_batch(size=1)
-    homework_exams_df = homework_exams_factory.build_df_batch(size=1)
+    homework_exams_df = homework_factory.build_df_batch(size=1)
 
     result = generate_gradebook(
         students_df=students_df, homework_exams_df=homework_exams_df
@@ -128,7 +128,7 @@ def test_results_are_grouped_by_student_group_for_students_in_one_group(
 
 
 def test_results_are_grouped_by_student_group_for_students_in_multiple_groups(
-    students_factory, homework_exams_factory
+    students_factory, homework_factory
 ):
     students_df = pd.concat(
         [
@@ -136,7 +136,7 @@ def test_results_are_grouped_by_student_group_for_students_in_multiple_groups(
             students_factory.build_df_batch(size=1, Group=2),
         ]
     )
-    homework_exams_df = homework_exams_factory.build_df_batch(size=2)
+    homework_exams_df = homework_factory.build_df_batch(size=2)
 
     result = generate_gradebook(
         students_df=students_df, homework_exams_df=homework_exams_df
@@ -149,10 +149,10 @@ def test_results_are_grouped_by_student_group_for_students_in_multiple_groups(
 
 @pytest.fixture
 def two_students_in_the_same_group_with_homeworks(
-    students_factory, homework_exams_factory
+    students_factory, homework_factory
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     students_df = students_factory.build_df_batch(size=2)
-    homework_exams_df = homework_exams_factory.build_df_batch(size=2)
+    homework_exams_df = homework_factory.build_df_batch(size=2)
 
     return students_df, homework_exams_df
 
@@ -211,10 +211,10 @@ def test_results_group_contains_students_last_name(
 
 
 def test_results_group_contains_students_homework_average_for_single_homework(
-    students_factory, homework_exams_factory
+    students_factory, homework_factory
 ):
     students_df = students_factory.build_df_batch(size=1)
-    homework_exams_df = homework_exams_factory.build_df_batch(size=1)
+    homework_exams_df = homework_factory.build_df_batch(size=1)
 
     result = generate_gradebook(
         students_df=students_df,
@@ -224,11 +224,11 @@ def test_results_group_contains_students_homework_average_for_single_homework(
     assert result[1]["homework_average"].to_list() == [0.5]
 
 
-def test_results_group_contains_students_homework_average_for_multiple_homeworks(
-    students_factory, multiple_homework_exams_factory
+def test_results_group_contains_students_homework_score_for_multiple_homeworks(
+    students_factory, multiple_homework_factory
 ):
     students_df = students_factory.build_df_batch(size=2)
-    homework_exams_df = multiple_homework_exams_factory.build_df_batch(size=2)
+    homework_exams_df = multiple_homework_factory.build_df_batch(size=2)
 
     result = generate_gradebook(
         students_df=students_df,
