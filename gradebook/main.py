@@ -37,19 +37,7 @@ class Gradebook:
         students_with_scores = self._students_df
 
         result = self._base_student_information()
-
-        homework_scores = students_with_scores.filter(
-            regex=r"^homework_\d\d?$",
-            axis=1,
-        )
-        homework_max_points = students_with_scores.filter(
-            regex=r"^homework_\d\d?_max_points$",
-            axis=1,
-        ).set_axis(homework_scores.columns, axis=1)
-        sum_of_homework_averages = (homework_scores / homework_max_points).sum(axis=1)
-        number_of_homeworks = homework_scores.shape[1]
-
-        result["homework_score"] = sum_of_homework_averages / number_of_homeworks
+        result["homework_score"] = self._homework_score()
 
         number_of_exams = students_with_scores.filter(
             regex=r"^exam_\d\d?$", axis=1
@@ -132,6 +120,20 @@ class Gradebook:
             ", ", expand=True
         )
         return result
+
+    def _homework_score(self) -> pd.Series:
+        homework_scores = self._students_df.filter(
+            regex=r"^homework_\d\d?$",
+            axis=1,
+        )
+        homework_max_points = self._students_df.filter(
+            regex=r"^homework_\d\d?_max_points$",
+            axis=1,
+        ).set_axis(homework_scores.columns, axis=1)
+        sum_of_homework_averages = (homework_scores / homework_max_points).sum(axis=1)
+        number_of_homeworks = homework_scores.shape[1]
+
+        return sum_of_homework_averages / number_of_homeworks
 
     def _sum_of_quiz_max(self) -> int:
         return sum(self._max_quiz_scores.values())
