@@ -2,7 +2,9 @@ import pandas as pd
 from typing import cast
 
 
-def _create_group(students_with_scores: pd.DataFrame) -> pd.DataFrame:
+def _create_group(
+    students_with_scores: pd.DataFrame, max_quiz_scores: dict
+) -> pd.DataFrame:
     result = pd.DataFrame(index=students_with_scores.index)
     result = result.assign(
         net_id=students_with_scores.index,
@@ -35,12 +37,26 @@ def _create_group(students_with_scores: pd.DataFrame) -> pd.DataFrame:
             / students_with_scores[f"exam_{exam_numer}_max_points"]
         )
 
+    sum_of_quiz_scores = students_with_scores.filter(regex=r"^quiz_\d$", axis=1).sum(
+        axis=1
+    )
+    sum_of_quiz_max = sum(max_quiz_scores.values())
+    result["quiz_score"] = (sum_of_quiz_scores / sum_of_quiz_max).round(2)
+
     return result
 
 
 def generate_gradebook(
-    students_df: pd.DataFrame, homework_exams_df: pd.DataFrame
+    students_df: pd.DataFrame,
+    homework_exams_df: pd.DataFrame,
+    quizes_results: dict[int, pd.DataFrame] | None = None,
+    max_quiz_scores: dict | None = None,
 ) -> dict[int, pd.DataFrame]:
+    if quizes_results is None:
+        quizes_results = {}
+    if max_quiz_scores is None:
+        max_quiz_scores = {}
+
     students_df.index = students_df.index.str.lower()
     students_with_scores = pd.merge(
         students_df,
@@ -48,7 +64,28 @@ def generate_gradebook(
         left_index=True,
         right_index=True,
     )
+    students_with_scores["Email Address"] = students_with_scores[
+        "Email Address"
+    ].str.lower()
+
+    all_quizes_results = pd.DataFrame(index=students_with_scores["Email Address"])
+    for quiz_number, quiz_results in quizes_results.items():
+        quiz_name = f"quiz_{quiz_number}"
+        quiz_results = quiz_results.drop(columns=["First Name", "Last Name"]).rename(
+            columns={"Grade": quiz_name}
+        )
+        all_quizes_results = pd.concat([all_quizes_results, quiz_results], axis=1)
+
+    students_with_scores = pd.merge(
+        students_with_scores,
+        all_quizes_results,
+        left_on="Email Address",
+        right_index=True,
+    )
+
     return {
-        cast(int, group): _create_group(students_with_scores=table)
+        cast(int, group): _create_group(
+            students_with_scores=table, max_quiz_scores=max_quiz_scores
+        )
         for group, table in students_with_scores.groupby("Group")
     }

@@ -95,6 +95,29 @@ def multiple_homework_exams_factory(
     return MultipleHomeworkExamsFactory
 
 
+@pytest.fixture
+def quiz_grades_factory():
+    class QuizGradesFactory(DataFrameFactory):
+        class Meta:
+            rename = {
+                "First_Name": "First Name",
+                "Last_Name": "Last Name",
+            }
+
+        First_Name = factory.Iterator(["John", "Second"])
+        Last_Name = factory.Iterator(["Doe", "Doe"])
+        Grade = factory.Iterator([7, 6])
+        Email = factory.LazyAttribute(
+            lambda o: f"{o.First_Name}.{o.Last_Name}@example.edu".lower()
+        )
+
+        @classmethod
+        def _converted_rows_to_df(cls, converterd_rows: list[dict]) -> pd.DataFrame:
+            return pd.DataFrame(data=converterd_rows).set_index("Email")
+
+    return QuizGradesFactory
+
+
 def test_students_factory(students_factory):
     assert students_factory.create() == {
         "ID": 1,
@@ -126,6 +149,15 @@ def test_homework_factory(homework_factory):
         "SID": "sxd54321",
         "homework_1": 40,
         "homework_1_max_points": 50,
+    }
+
+
+def test_quiz_grades_factory(quiz_grades_factory):
+    assert quiz_grades_factory.create() == {
+        "First Name": "John",
+        "Last Name": "Doe",
+        "Email": "john.doe@example.edu",
+        "Grade": 7,
     }
 
 
@@ -267,3 +299,28 @@ def test_results_group_contains_students_exam_score_for_multiple_homeworks(
     assert result[1]["exam_1_score"].to_list() == [0.95, 0.95]
     assert result[1]["exam_2_score"].to_list() == [0.9, 0.77]
     assert result[1]["exam_3_score"].to_list() == [0.73, 0.79]
+
+
+def test_results_group_contains_students_quiz_grades_score(
+    students_factory, homework_factory, quiz_grades_factory
+):
+    students_df = students_factory.build_df_batch(size=2)
+    homework_exams_df = homework_factory.build_df_batch(size=2)
+    quizes_results = {
+        1: quiz_grades_factory.build_df_batch(size=2),
+        2: quiz_grades_factory.build_df_batch(size=2, Grade=20),
+        3: quiz_grades_factory.build_df_batch(size=2, Grade=15),
+    }
+    max_quiz_scores = {
+        1: 8,
+        2: 25,
+        3: 16,
+    }
+    result = generate_gradebook(
+        students_df=students_df,
+        homework_exams_df=homework_exams_df,
+        quizes_results=quizes_results,
+        max_quiz_scores=max_quiz_scores,
+    )
+
+    assert result[1]["quiz_score"].to_list() == [0.86, 0.84]
