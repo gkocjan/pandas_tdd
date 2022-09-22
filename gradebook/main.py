@@ -26,8 +26,10 @@ class Gradebook:
     ):
         self._students_df = students_df
         self._set_students_index()
+        self._fill_students_with_homework_and_exams_data(
+            homework_exams_df=homework_exams_df
+        )
 
-        self._homework_exams_df = homework_exams_df
         self._quizes_results: dict[int, pd.DataFrame] = (
             quizes_results if quizes_results is not None else {}
         )
@@ -38,13 +40,15 @@ class Gradebook:
     def _set_students_index(self):
         self._students_df.index = self._students_df.index.str.lower()
 
-    def generate(self) -> dict[int, pd.DataFrame]:
-        students_with_scores = pd.merge(
-            self._students_df,
-            self._homework_exams_df,
-            left_index=True,
-            right_index=True,
+    def _fill_students_with_homework_and_exams_data(
+        self, homework_exams_df: pd.DataFrame
+    ) -> None:
+        self._students_df = pd.merge(
+            self._students_df, homework_exams_df, left_index=True, right_index=True
         )
+
+    def generate(self) -> dict[int, pd.DataFrame]:
+        students_with_scores = self._students_df
         students_with_scores["Email Address"] = students_with_scores[
             "Email Address"
         ].str.lower()
