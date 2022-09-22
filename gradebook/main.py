@@ -18,14 +18,6 @@ def _create_group(students_with_scores: pd.DataFrame) -> pd.DataFrame:
     return result
 
 
-def generate_grade_book(
-    students_df: pd.DataFrame, homework_exams_df: pd.DataFrame
-) -> dict[int, pd.DataFrame]:
-    return generate_gradebook(
-        students_df=students_df, homework_exams_df=homework_exams_df
-    )
-
-
 def generate_gradebook(
     students_df: pd.DataFrame, homework_exams_df: pd.DataFrame
 ) -> dict[int, pd.DataFrame]:

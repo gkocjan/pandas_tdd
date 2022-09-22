@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from gradebook.main import generate_grade_book, generate_gradebook
+from gradebook.main import generate_gradebook
 
 
 def test_results_are_grouped_by_student_group_for_students_in_one_group():
@@ -124,7 +124,7 @@ def test_results_group_contains_students_net_id_lowercase(
     two_students_in_the_same_group_with_homeworks,
 ):
     students_df, homework_exams_df = two_students_in_the_same_group_with_homeworks
-    result = generate_grade_book(
+    result = generate_gradebook(
         students_df=students_df, homework_exams_df=homework_exams_df
     )
 
@@ -135,7 +135,7 @@ def test_results_group_contains_students_email_adress_lowercase(
     two_students_in_the_same_group_with_homeworks,
 ):
     students_df, homework_exams_df = two_students_in_the_same_group_with_homeworks
-    result = generate_grade_book(
+    result = generate_gradebook(
         students_df=students_df, homework_exams_df=homework_exams_df
     )
 
@@ -149,7 +149,7 @@ def test_results_group_contains_students_first_name(
     two_students_in_the_same_group_with_homeworks,
 ):
     students_df, homework_exams_df = two_students_in_the_same_group_with_homeworks
-    result = generate_grade_book(
+    result = generate_gradebook(
         students_df=students_df, homework_exams_df=homework_exams_df
     )
 
@@ -163,7 +163,7 @@ def test_results_group_contains_students_last_name(
     two_students_in_the_same_group_with_homeworks,
 ):
     students_df, homework_exams_df = two_students_in_the_same_group_with_homeworks
-    result = generate_grade_book(
+    result = generate_gradebook(
         students_df=students_df, homework_exams_df=homework_exams_df
     )
 
@@ -195,7 +195,7 @@ def test_results_group_contains_students_homework_average_for_single_homework():
     ]
     homework_exams_df = pd.DataFrame(data=homework_exams).set_index("SID")
 
-    result = generate_grade_book(
+    result = generate_gradebook(
         students_df=students_df,
         homework_exams_df=homework_exams_df,
     )
