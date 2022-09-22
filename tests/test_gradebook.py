@@ -74,16 +74,10 @@ def test_homework_factory(homework_exams_factory):
     }
 
 
-def test_results_are_grouped_by_student_group_for_students_in_one_group():
-    students = [
-        {
-            "ID": 1,
-            "Name": "Doe, John",
-            "NetID": "JXD12345",
-            "Email Address": "JOHN.DOE@EXAMPLE.EDU",
-            "Group": 1,
-        }
-    ]
+def test_results_are_grouped_by_student_group_for_students_in_one_group(
+    students_factory,
+):
+    students = [students_factory.create()]
     students_df = pd.DataFrame(data=students).set_index("NetID")
     homework_exams = [
         {
@@ -103,22 +97,12 @@ def test_results_are_grouped_by_student_group_for_students_in_one_group():
     assert list(result.keys()) == [1]
 
 
-def test_results_are_grouped_by_student_group_for_students_in_multiple_groups():
+def test_results_are_grouped_by_student_group_for_students_in_multiple_groups(
+    students_factory,
+):
     students = [
-        {
-            "ID": 1,
-            "Name": "Doe, John",
-            "NetID": "JXD12345",
-            "Email Address": "JOHN.DOE@EXAMPLE.EDU",
-            "Group": 1,
-        },
-        {
-            "ID": 2,
-            "Name": "Doe, Second",
-            "NetID": "SXD54321",
-            "Email Address": "SECOND.DOE@EXAMPLE.EDU",
-            "Group": 2,
-        },
+        students_factory.create(),
+        students_factory.create(Group=2),
     ]
     homework_exams = [
         {
@@ -149,25 +133,10 @@ def test_results_are_grouped_by_student_group_for_students_in_multiple_groups():
 
 
 @pytest.fixture
-def two_students_in_the_same_group_with_homeworks() -> tuple[
-    pd.DataFrame, pd.DataFrame
-]:
-    students = [
-        {
-            "ID": 1,
-            "Name": "Doe, John",
-            "NetID": "JXD12345",
-            "Email Address": "JOHN.DOE@EXAMPLE.EDU",
-            "Group": 1,
-        },
-        {
-            "ID": 2,
-            "Name": "Doe, Second",
-            "NetID": "SXD54321",
-            "Email Address": "SECOND.DOE@EXAMPLE.EDU",
-            "Group": 1,
-        },
-    ]
+def two_students_in_the_same_group_with_homeworks(
+    students_factory,
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    students = students_factory.create_batch(size=2)
     homework_exams = [
         {
             "First Name": "John",
