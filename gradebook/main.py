@@ -132,10 +132,7 @@ class Gradebook:
         return self._students_df.filter(regex=r"^exam_\d\d?$", axis=1).shape[1]
 
     def _exam_column_names(self) -> list[str]:
-        return [
-            f"exam_{exam_numer}_score"
-            for exam_numer in range(1, self._number_of_exams() + 1)
-        ]
+        return [f"exam_{exam_numer}_score" for exam_numer in self._exam_numers]
 
     def _exam_scores(self) -> list[pd.Series]:
         return [
@@ -143,8 +140,12 @@ class Gradebook:
                 self._students_df[f"exam_{exam_numer}"]
                 / self._students_df[f"exam_{exam_numer}_max_points"]
             )
-            for exam_numer in range(1, self._number_of_exams() + 1)
+            for exam_numer in self._exam_numers
         ]
+
+    @property
+    def _exam_numers(self) -> range:
+        return range(1, self._number_of_exams() + 1)
 
     def _sum_of_quiz_max(self) -> int:
         return sum(self._max_quiz_scores.values())
