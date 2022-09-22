@@ -82,6 +82,8 @@ def test_results_are_grouped_by_student_group_for_students_in_multiple_groups():
     result = generate_grade_book(students_df=students_df)
 
     assert list(result.keys()) == [1, 2]
+    assert result[1]["net_id"].to_list() == ["jxd12345"]
+    assert result[2]["net_id"].to_list() == ["sxd54321"]
 
 
 @pytest.fixture
