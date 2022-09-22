@@ -57,21 +57,23 @@ class Gradebook:
     def _fill_students_with_quizes_results(
         self, quizes_results: dict[int, pd.DataFrame] | None
     ):
-        quizes_results = quizes_results if quizes_results is not None else {}
-        all_quizes_results = pd.DataFrame(index=self._students_df["Email Address"])
-        for quiz_number, quiz_results in quizes_results.items():
-            quiz_name = f"quiz_{quiz_number}"
-            quiz_results = quiz_results.drop(
-                columns=["First Name", "Last Name"]
-            ).rename(columns={"Grade": quiz_name})
-            all_quizes_results = pd.concat([all_quizes_results, quiz_results], axis=1)
+        if quizes_results is not None:
+            all_quizes_results = pd.DataFrame()
+            for quiz_number, quiz_results in quizes_results.items():
+                quiz_name = f"quiz_{quiz_number}"
+                quiz_results = quiz_results.drop(
+                    columns=["First Name", "Last Name"]
+                ).rename(columns={"Grade": quiz_name})
+                all_quizes_results = pd.concat(
+                    [all_quizes_results, quiz_results], axis=1
+                )
 
-        self._students_df = pd.merge(
-            self._students_df,
-            all_quizes_results,
-            left_on="Email Address",
-            right_index=True,
-        )
+            self._students_df = pd.merge(
+                self._students_df,
+                all_quizes_results,
+                left_on="Email Address",
+                right_index=True,
+            )
 
     def generate(self) -> dict[int, pd.DataFrame]:
         students_with_scores = self._students_df
