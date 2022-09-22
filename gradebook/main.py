@@ -25,6 +25,19 @@ class Gradebook:
         max_quiz_scores: dict | None = None,
     ):
         self._students_df = students_df
+        self._max_quiz_scores: dict = (
+            max_quiz_scores if max_quiz_scores is not None else {}
+        )
+
+        self._prepare_full_students_data(
+            homework_exams_df=homework_exams_df, quizes_results=quizes_results
+        )
+
+    def _prepare_full_students_data(
+        self,
+        homework_exams_df: pd.DataFrame,
+        quizes_results: dict[int, pd.DataFrame] | None = None,
+    ):
         self._set_students_index()
         self._convert_email_address_to_lowe_case()
 
@@ -33,10 +46,6 @@ class Gradebook:
         )
         self._fill_students_with_quizes_results(
             quizes_results=quizes_results,
-        )
-
-        self._max_quiz_scores: dict = (
-            max_quiz_scores if max_quiz_scores is not None else {}
         )
 
     def _set_students_index(self):
@@ -84,7 +93,7 @@ class Gradebook:
         result = result.assign(
             net_id=students_with_scores.index,
             group=students_with_scores["Group"],
-            email_address=students_with_scores["Email Address"].str.lower(),
+            email_address=students_with_scores["Email Address"],
         )
         result[["last_name", "first_name"]] = students_with_scores["Name"].str.split(
             ", ", expand=True
