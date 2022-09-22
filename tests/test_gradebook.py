@@ -75,19 +75,11 @@ def test_homework_factory(homework_exams_factory):
 
 
 def test_results_are_grouped_by_student_group_for_students_in_one_group(
-    students_factory,
+    students_factory, homework_exams_factory
 ):
     students = [students_factory.create()]
     students_df = pd.DataFrame(data=students).set_index("NetID")
-    homework_exams = [
-        {
-            "First Name": "John",
-            "Last Name": "Doe",
-            "SID": "jxd12345",
-            "homework_1": 25,
-            "homework_1_max_points": 50,
-        }
-    ]
+    homework_exams = [homework_exams_factory.create()]
     homework_exams_df = pd.DataFrame(data=homework_exams).set_index("SID")
 
     result = generate_gradebook(
@@ -98,28 +90,13 @@ def test_results_are_grouped_by_student_group_for_students_in_one_group(
 
 
 def test_results_are_grouped_by_student_group_for_students_in_multiple_groups(
-    students_factory,
+    students_factory, homework_exams_factory
 ):
     students = [
         students_factory.create(),
         students_factory.create(Group=2),
     ]
-    homework_exams = [
-        {
-            "First Name": "John",
-            "Last Name": "Doe",
-            "SID": "jxd12345",
-            "homework_1": 25,
-            "homework_1_max_points": 50,
-        },
-        {
-            "First Name": "Second",
-            "Last Name": "Doe",
-            "SID": "sxd54321",
-            "homework_1": 40,
-            "homework_1_max_points": 50,
-        },
-    ]
+    homework_exams = homework_exams_factory.create_batch(size=2)
     students_df = pd.DataFrame(data=students).set_index("NetID")
     homework_exams_df = pd.DataFrame(data=homework_exams).set_index("SID")
 
@@ -134,25 +111,11 @@ def test_results_are_grouped_by_student_group_for_students_in_multiple_groups(
 
 @pytest.fixture
 def two_students_in_the_same_group_with_homeworks(
-    students_factory,
+    students_factory, homework_exams_factory
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     students = students_factory.create_batch(size=2)
-    homework_exams = [
-        {
-            "First Name": "John",
-            "Last Name": "Doe",
-            "SID": "jxd12345",
-            "homework_1": 25,
-            "homework_1_max_points": 50,
-        },
-        {
-            "First Name": "Second",
-            "Last Name": "Doe",
-            "SID": "sxd54321",
-            "homework_1": 40,
-            "homework_1_max_points": 50,
-        },
-    ]
+    homework_exams = homework_exams_factory.create_batch(size=2)
+
     students_df = pd.DataFrame(data=students).set_index("NetID")
     homework_exams_df = pd.DataFrame(data=homework_exams).set_index("SID")
 
