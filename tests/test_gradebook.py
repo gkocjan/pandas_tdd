@@ -5,9 +5,28 @@ import pytest
 from gradebook.main import generate_gradebook
 
 
+class DataFrameFactory(factory.DictFactory):
+    @classmethod
+    def build_df_batch(cls, size, **kwargs) -> pd.DataFrame:
+        """Build a batch of instances of the given class, with overridden attrs.
+
+        Args:
+            size (int): the number of instances to build
+
+        Returns:
+            object pd.DataFrame: the built instances with js_round(ed) values
+        """
+        raw_rows = cls.build_batch(size=size, **kwargs)
+        return cls._converted_rows_to_df(raw_rows)
+
+    @classmethod
+    def _converted_rows_to_df(cls, converterd_rows: list[dict]) -> pd.DataFrame:
+        return pd.DataFrame(data=converterd_rows)
+
+
 @pytest.fixture
-def students_factory():
-    class StudentsFactory(factory.DictFactory):
+def students_factory() -> type[DataFrameFactory]:
+    class StudentsFactory(DataFrameFactory):
         class Meta:
             rename = {"Email_Address": "Email Address"}
 
@@ -19,12 +38,16 @@ def students_factory():
         )
         Group = 1
 
+        @classmethod
+        def _converted_rows_to_df(cls, converterd_rows: list[dict]) -> pd.DataFrame:
+            return pd.DataFrame(data=converterd_rows).set_index("NetID")
+
     return StudentsFactory
 
 
 @pytest.fixture
-def homework_exams_factory():
-    class HomeworkExamsFactory(factory.DictFactory):
+def homework_exams_factory() -> type[DataFrameFactory]:
+    class HomeworkExamsFactory(DataFrameFactory):
         class Meta:
             rename = {
                 "First_Name": "First Name",
@@ -36,6 +59,10 @@ def homework_exams_factory():
         SID = factory.Iterator(["jxd12345", "sxd54321"])
         homework_1 = factory.Iterator([25, 40])
         homework_1_max_points = factory.Iterator([50, 50])
+
+        @classmethod
+        def _converted_rows_to_df(cls, converterd_rows: list[dict]) -> pd.DataFrame:
+            return pd.DataFrame(data=converterd_rows).set_index("SID")
 
     return HomeworkExamsFactory
 
@@ -77,10 +104,8 @@ def test_homework_factory(homework_exams_factory):
 def test_results_are_grouped_by_student_group_for_students_in_one_group(
     students_factory, homework_exams_factory
 ):
-    students = [students_factory.create()]
-    students_df = pd.DataFrame(data=students).set_index("NetID")
-    homework_exams = [homework_exams_factory.create()]
-    homework_exams_df = pd.DataFrame(data=homework_exams).set_index("SID")
+    students_df = students_factory.build_df_batch(size=1)
+    homework_exams_df = homework_exams_factory.build_df_batch(size=1)
 
     result = generate_gradebook(
         students_df=students_df, homework_exams_df=homework_exams_df
@@ -92,13 +117,13 @@ def test_results_are_grouped_by_student_group_for_students_in_one_group(
 def test_results_are_grouped_by_student_group_for_students_in_multiple_groups(
     students_factory, homework_exams_factory
 ):
-    students = [
-        students_factory.create(),
-        students_factory.create(Group=2),
-    ]
-    homework_exams = homework_exams_factory.create_batch(size=2)
-    students_df = pd.DataFrame(data=students).set_index("NetID")
-    homework_exams_df = pd.DataFrame(data=homework_exams).set_index("SID")
+    students_df = pd.concat(
+        [
+            students_factory.build_df_batch(size=1),
+            students_factory.build_df_batch(size=1, Group=2),
+        ]
+    )
+    homework_exams_df = homework_exams_factory.build_df_batch(size=2)
 
     result = generate_gradebook(
         students_df=students_df, homework_exams_df=homework_exams_df
@@ -113,11 +138,8 @@ def test_results_are_grouped_by_student_group_for_students_in_multiple_groups(
 def two_students_in_the_same_group_with_homeworks(
     students_factory, homework_exams_factory
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
-    students = students_factory.create_batch(size=2)
-    homework_exams = homework_exams_factory.create_batch(size=2)
-
-    students_df = pd.DataFrame(data=students).set_index("NetID")
-    homework_exams_df = pd.DataFrame(data=homework_exams).set_index("SID")
+    students_df = students_factory.build_df_batch(size=2)
+    homework_exams_df = homework_exams_factory.build_df_batch(size=2)
 
     return students_df, homework_exams_df
 
