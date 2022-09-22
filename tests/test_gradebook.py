@@ -38,8 +38,8 @@ def generate_grade_book(
         right_index=True,
     )
     return {
-        cast(int, group): _create_group(students_with_scores=students_with_scores)
-        for group, table in students_df.groupby("Group")
+        cast(int, group): _create_group(students_with_scores=table)
+        for group, table in students_with_scores.groupby("Group")
     }
 
 
