@@ -34,19 +34,11 @@ class Gradebook:
         )
 
     def generate(self) -> dict[int, pd.DataFrame]:
-        students_with_scores = self._students_df
-
         result = self._base_student_information()
         result["homework_score"] = self._homework_score()
-
-        number_of_exams = self._number_of_exams()
-
-        for exam_numer in range(1, number_of_exams + 1):
-            result[f"exam_{exam_numer}_score"] = (
-                students_with_scores[f"exam_{exam_numer}"]
-                / students_with_scores[f"exam_{exam_numer}_max_points"]
-            )
-
+        result = result.assign(
+            **dict(zip(self._exam_column_names(), self._exam_scores()))
+        )
         result["quiz_score"] = self._quiz_score()
 
         return {cast(int, group): table for group, table in result.groupby("group")}
@@ -138,6 +130,21 @@ class Gradebook:
 
     def _number_of_exams(self) -> int:
         return self._students_df.filter(regex=r"^exam_\d\d?$", axis=1).shape[1]
+
+    def _exam_column_names(self) -> list[str]:
+        return [
+            f"exam_{exam_numer}_score"
+            for exam_numer in range(1, self._number_of_exams() + 1)
+        ]
+
+    def _exam_scores(self) -> list[pd.Series]:
+        return [
+            (
+                self._students_df[f"exam_{exam_numer}"]
+                / self._students_df[f"exam_{exam_numer}_max_points"]
+            )
+            for exam_numer in range(1, self._number_of_exams() + 1)
+        ]
 
     def _sum_of_quiz_max(self) -> int:
         return sum(self._max_quiz_scores.values())
