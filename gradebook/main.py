@@ -27,13 +27,14 @@ class Gradebook:
         self._students_df = students_df
         self._set_students_index()
         self._convert_email_address_to_lowe_case()
+
         self._fill_students_with_homework_and_exams_data(
-            homework_exams_df=homework_exams_df
+            homework_exams_df=homework_exams_df,
+        )
+        self._fill_students_with_quizes_results(
+            quizes_results=quizes_results,
         )
 
-        self._quizes_results: dict[int, pd.DataFrame] = (
-            quizes_results if quizes_results is not None else {}
-        )
         self._max_quiz_scores: dict = (
             max_quiz_scores if max_quiz_scores is not None else {}
         )
@@ -53,23 +54,27 @@ class Gradebook:
             self._students_df, homework_exams_df, left_index=True, right_index=True
         )
 
-    def generate(self) -> dict[int, pd.DataFrame]:
-        students_with_scores = self._students_df
-
-        all_quizes_results = pd.DataFrame(index=students_with_scores["Email Address"])
-        for quiz_number, quiz_results in self._quizes_results.items():
+    def _fill_students_with_quizes_results(
+        self, quizes_results: dict[int, pd.DataFrame] | None
+    ):
+        quizes_results = quizes_results if quizes_results is not None else {}
+        all_quizes_results = pd.DataFrame(index=self._students_df["Email Address"])
+        for quiz_number, quiz_results in quizes_results.items():
             quiz_name = f"quiz_{quiz_number}"
             quiz_results = quiz_results.drop(
                 columns=["First Name", "Last Name"]
             ).rename(columns={"Grade": quiz_name})
             all_quizes_results = pd.concat([all_quizes_results, quiz_results], axis=1)
 
-        students_with_scores = pd.merge(
-            students_with_scores,
+        self._students_df = pd.merge(
+            self._students_df,
             all_quizes_results,
             left_on="Email Address",
             right_index=True,
         )
+
+    def generate(self) -> dict[int, pd.DataFrame]:
+        students_with_scores = self._students_df
 
         result = pd.DataFrame(index=students_with_scores.index)
         result = result.assign(
