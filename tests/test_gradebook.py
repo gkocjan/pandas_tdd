@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from gradebook.main import generate_grade_book
+from gradebook.main import generate_grade_book, generate_gradebook
 
 
 def test_results_are_grouped_by_student_group_for_students_in_one_group():
@@ -26,7 +26,7 @@ def test_results_are_grouped_by_student_group_for_students_in_one_group():
     ]
     homework_exams_df = pd.DataFrame(data=homework_exams).set_index("SID")
 
-    result = generate_grade_book(
+    result = generate_gradebook(
         students_df=students_df, homework_exams_df=homework_exams_df
     )
 
@@ -69,7 +69,7 @@ def test_results_are_grouped_by_student_group_for_students_in_multiple_groups():
     students_df = pd.DataFrame(data=students).set_index("NetID")
     homework_exams_df = pd.DataFrame(data=homework_exams).set_index("SID")
 
-    result = generate_grade_book(
+    result = generate_gradebook(
         students_df=students_df, homework_exams_df=homework_exams_df
     )
 
