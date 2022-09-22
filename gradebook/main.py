@@ -21,6 +21,14 @@ def _create_group(students_with_scores: pd.DataFrame) -> pd.DataFrame:
 def generate_grade_book(
     students_df: pd.DataFrame, homework_exams_df: pd.DataFrame
 ) -> dict[int, pd.DataFrame]:
+    return generate_gradebook(
+        students_df=students_df, homework_exams_df=homework_exams_df
+    )
+
+
+def generate_gradebook(
+    students_df: pd.DataFrame, homework_exams_df: pd.DataFrame
+) -> dict[int, pd.DataFrame]:
     students_df.index = students_df.index.str.lower()
     students_with_scores = pd.merge(
         students_df,
