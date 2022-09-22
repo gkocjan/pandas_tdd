@@ -23,7 +23,7 @@ def _create_group(students_with_scores: pd.DataFrame) -> pd.DataFrame:
     sum_of_homework_averages = (homework_scores / homework_max_points).sum(axis=1)
     number_of_homeworks = homework_scores.shape[1]
 
-    result["homework_average"] = sum_of_homework_averages / number_of_homeworks
+    result["homework_score"] = sum_of_homework_averages / number_of_homeworks
 
     number_of_exams = students_with_scores.filter(regex=r"^exam_\d\d?$", axis=1).shape[
         1

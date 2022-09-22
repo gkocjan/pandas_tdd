@@ -236,7 +236,7 @@ def test_results_group_contains_students_homework_average_for_single_homework(
         homework_exams_df=homework_exams_df,
     )
 
-    assert result[1]["homework_average"].to_list() == [0.5]
+    assert result[1]["homework_score"].to_list() == [0.5]
 
 
 def test_results_group_contains_students_homework_score_for_multiple_homeworks(
@@ -250,7 +250,7 @@ def test_results_group_contains_students_homework_score_for_multiple_homeworks(
         homework_exams_df=homework_exams_df,
     )
 
-    assert result[1]["homework_average"].to_list() == [0.4, 0.7]
+    assert result[1]["homework_score"].to_list() == [0.4, 0.7]
 
 
 def test_results_group_contains_students_exam_score_for_multiple_homeworks(
