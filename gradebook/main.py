@@ -26,6 +26,7 @@ class Gradebook:
     ):
         self._students_df = students_df
         self._set_students_index()
+        self._convert_email_address_to_lowe_case()
         self._fill_students_with_homework_and_exams_data(
             homework_exams_df=homework_exams_df
         )
@@ -40,6 +41,11 @@ class Gradebook:
     def _set_students_index(self):
         self._students_df.index = self._students_df.index.str.lower()
 
+    def _convert_email_address_to_lowe_case(self):
+        self._students_df["Email Address"] = self._students_df[
+            "Email Address"
+        ].str.lower()
+
     def _fill_students_with_homework_and_exams_data(
         self, homework_exams_df: pd.DataFrame
     ) -> None:
@@ -49,9 +55,6 @@ class Gradebook:
 
     def generate(self) -> dict[int, pd.DataFrame]:
         students_with_scores = self._students_df
-        students_with_scores["Email Address"] = students_with_scores[
-            "Email Address"
-        ].str.lower()
 
         all_quizes_results = pd.DataFrame(index=students_with_scores["Email Address"])
         for quiz_number, quiz_results in self._quizes_results.items():
