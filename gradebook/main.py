@@ -25,6 +25,8 @@ class Gradebook:
         max_quiz_scores: dict | None = None,
     ):
         self._students_df = students_df
+        self._set_students_index()
+
         self._homework_exams_df = homework_exams_df
         self._quizes_results: dict[int, pd.DataFrame] = (
             quizes_results if quizes_results is not None else {}
@@ -33,8 +35,10 @@ class Gradebook:
             max_quiz_scores if max_quiz_scores is not None else {}
         )
 
-    def generate(self) -> dict[int, pd.DataFrame]:
+    def _set_students_index(self):
         self._students_df.index = self._students_df.index.str.lower()
+
+    def generate(self) -> dict[int, pd.DataFrame]:
         students_with_scores = pd.merge(
             self._students_df,
             self._homework_exams_df,
