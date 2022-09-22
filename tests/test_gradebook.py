@@ -48,27 +48,6 @@ def test_results_are_grouped_by_student_group_for_students_in_multiple_groups():
 
 
 @pytest.fixture
-def two_students_in_the_same_group() -> pd.DataFrame:
-    students = [
-        {
-            "ID": 1,
-            "Name": "Doe, John",
-            "NetID": "JXD12345",
-            "Email Address": "JOHN.DOE@EXAMPLE.EDU",
-            "Group": 1,
-        },
-        {
-            "ID": 2,
-            "Name": "Doe, Second",
-            "NetID": "SXD54321",
-            "Email Address": "SECOND.DOE@EXAMPLE.EDU",
-            "Group": 1,
-        },
-    ]
-    return pd.DataFrame(data=students).set_index("NetID")
-
-
-@pytest.fixture
 def two_students_in_the_same_group_with_homeworks() -> tuple[
     pd.DataFrame, pd.DataFrame
 ]:
