@@ -19,17 +19,9 @@ def _create_group(students_with_scores: pd.DataFrame) -> pd.DataFrame:
 
 
 def generate_grade_book(
-    students_df: pd.DataFrame, homework_exams_df: pd.DataFrame | None = None
+    students_df: pd.DataFrame, homework_exams_df: pd.DataFrame
 ) -> dict[int, pd.DataFrame]:
     students_df.index = students_df.index.str.lower()
-
-    if homework_exams_df is None:
-        homework_exams_df = pd.DataFrame(index=students_df.index)
-        homework_exams_df = homework_exams_df.assign(
-            homework_1=0,
-            homework_1_max_points=1,
-        )
-
     students_with_scores = pd.merge(
         students_df,
         homework_exams_df,

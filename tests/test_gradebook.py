@@ -15,8 +15,20 @@ def test_results_are_grouped_by_student_group_for_students_in_one_group():
         }
     ]
     students_df = pd.DataFrame(data=students).set_index("NetID")
+    homework_exams = [
+        {
+            "First Name": "John",
+            "Last Name": "Doe",
+            "SID": "jxd12345",
+            "homework_1": 25,
+            "homework_1_max_points": 50,
+        }
+    ]
+    homework_exams_df = pd.DataFrame(data=homework_exams).set_index("SID")
 
-    result = generate_grade_book(students_df=students_df)
+    result = generate_grade_book(
+        students_df=students_df, homework_exams_df=homework_exams_df
+    )
 
     assert list(result.keys()) == [1]
 
@@ -38,9 +50,28 @@ def test_results_are_grouped_by_student_group_for_students_in_multiple_groups():
             "Group": 2,
         },
     ]
+    homework_exams = [
+        {
+            "First Name": "John",
+            "Last Name": "Doe",
+            "SID": "jxd12345",
+            "homework_1": 25,
+            "homework_1_max_points": 50,
+        },
+        {
+            "First Name": "Second",
+            "Last Name": "Doe",
+            "SID": "sxd54321",
+            "homework_1": 40,
+            "homework_1_max_points": 50,
+        },
+    ]
     students_df = pd.DataFrame(data=students).set_index("NetID")
+    homework_exams_df = pd.DataFrame(data=homework_exams).set_index("SID")
 
-    result = generate_grade_book(students_df=students_df)
+    result = generate_grade_book(
+        students_df=students_df, homework_exams_df=homework_exams_df
+    )
 
     assert list(result.keys()) == [1, 2]
     assert result[1]["net_id"].to_list() == ["jxd12345"]
