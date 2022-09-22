@@ -68,10 +68,55 @@ def two_students_in_the_same_group() -> pd.DataFrame:
     return pd.DataFrame(data=students).set_index("NetID")
 
 
+@pytest.fixture
+def two_students_in_the_same_group_with_homeworks() -> tuple[
+    pd.DataFrame, pd.DataFrame
+]:
+    students = [
+        {
+            "ID": 1,
+            "Name": "Doe, John",
+            "NetID": "JXD12345",
+            "Email Address": "JOHN.DOE@EXAMPLE.EDU",
+            "Group": 1,
+        },
+        {
+            "ID": 2,
+            "Name": "Doe, Second",
+            "NetID": "SXD54321",
+            "Email Address": "SECOND.DOE@EXAMPLE.EDU",
+            "Group": 1,
+        },
+    ]
+    homework_exams = [
+        {
+            "First Name": "John",
+            "Last Name": "Doe",
+            "SID": "jxd12345",
+            "homework_1": 25,
+            "homework_1_max_points": 50,
+        },
+        {
+            "First Name": "Second",
+            "Last Name": "Doe",
+            "SID": "sxd54321",
+            "homework_1": 40,
+            "homework_1_max_points": 50,
+        },
+    ]
+    students_df = pd.DataFrame(data=students).set_index("NetID")
+    homework_exams_df = pd.DataFrame(data=homework_exams).set_index("SID")
+
+    return students_df, homework_exams_df
+
+
 def test_results_group_contains_students_net_id_lowercase(
-    two_students_in_the_same_group,
+    two_students_in_the_same_group_with_homeworks,
 ):
-    result = generate_grade_book(students_df=two_students_in_the_same_group)
+    students_df, homework_exams_df = two_students_in_the_same_group_with_homeworks
+    result = generate_grade_book(
+        students_df=students_df, homework_exams_df=homework_exams_df
+    )
 
     assert result[1]["net_id"].to_list() == ["jxd12345", "sxd54321"]
 
